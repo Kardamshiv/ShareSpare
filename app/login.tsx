@@ -1,13 +1,56 @@
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
-    ScrollView, StyleSheet,
-    Text, TextInput, TouchableOpacity,
-    View
+  ScrollView, StyleSheet, Alert,
+  Text, TextInput, TouchableOpacity,
+  View, ActivityIndicator
 } from 'react-native';
 import { Colors } from '../constants/Colors';
+import { supabase } from '../lib/supabase';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+
+  async function handleAuth() {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password.');
+      return;
+    }
+
+    setLoading(true);
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: email.split('@')[0],
+            initials: email.substring(0, 2).toUpperCase()
+          }
+        }
+      });
+      if (error) {
+        Alert.alert('Sign Up Error', error.message);
+      } else {
+        router.replace('/(tabs)');
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        Alert.alert('Login Error', error.message);
+      } else {
+        router.replace('/(tabs)');
+      }
+    }
+    setLoading(false);
+  }
 
   return (
     <ScrollView
@@ -26,8 +69,8 @@ export default function LoginScreen() {
 
       {/* Card */}
       <View style={styles.card}>
-        <Text style={styles.title}>Welcome back 👋</Text>
-        <Text style={styles.subtitle}>Sign in with your college email</Text>
+        <Text style={styles.title}>{isSignUp ? 'Create Account 🚀' : 'Welcome back 👋'}</Text>
+        <Text style={styles.subtitle}>{isSignUp ? 'Sign up with your college email' : 'Sign in with your college email'}</Text>
 
         <Text style={styles.label}>College Email</Text>
         <TextInput
@@ -36,13 +79,30 @@ export default function LoginScreen() {
           placeholderTextColor={Colors.textLight}
           keyboardType="email-address"
           autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+        />
+
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="••••••••"
+          placeholderTextColor={Colors.textLight}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
 
         <TouchableOpacity
           style={styles.btnPrimary}
-          onPress={() => router.replace('/(tabs)')}
+          onPress={handleAuth}
+          disabled={loading}
         >
-          <Text style={styles.btnText}>Continue →</Text>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.btnText}>{isSignUp ? 'Sign Up' : 'Continue →'}</Text>
+          )}
         </TouchableOpacity>
 
         <View style={styles.divRow}>
@@ -52,18 +112,16 @@ export default function LoginScreen() {
         </View>
 
         <TouchableOpacity
-          style={styles.btnGoogle}
-          onPress={() => router.replace('/(tabs)')}
+          style={{ paddingVertical: 10 }}
+          onPress={() => setIsSignUp(!isSignUp)}
         >
-          <Text style={styles.btnGoogleText}>🔵  Continue with Google</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.footer}>
-          New here?{'  '}
-          <Text style={{ color: Colors.primary, fontWeight: '600' }}>
-            Create account
+          <Text style={styles.footer}>
+            {isSignUp ? 'Already have an account? ' : 'New here? '}
+            <Text style={{ color: Colors.primary, fontWeight: '600' }}>
+              {isSignUp ? 'Sign in instead' : 'Create account'}
+            </Text>
           </Text>
-        </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -71,31 +129,31 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   hero: {
-    alignItems:    'center',
-    paddingTop:    70,
+    alignItems: 'center',
+    paddingTop: 70,
     paddingBottom: 44,
   },
   logoBox: {
     width: 72, height: 72,
-    borderRadius:    22,
+    borderRadius: 22,
     backgroundColor: 'rgba(255,255,255,0.2)',
-    borderWidth:     2,
-    borderColor:     'rgba(255,255,255,0.35)',
-    alignItems:      'center',
-    justifyContent:  'center',
-    marginBottom:    14,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
   },
-  appName:  { fontSize: 28, fontWeight: '700', color: '#fff' },
-  tagline:  { fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 4 },
+  appName: { fontSize: 28, fontWeight: '700', color: '#fff' },
+  tagline: { fontSize: 13, color: 'rgba(255,255,255,0.75)', marginTop: 4 },
   card: {
-    flex:                1,
-    backgroundColor:     Colors.card,
+    flex: 1,
+    backgroundColor: Colors.card,
     borderTopLeftRadius: 28,
-    borderTopRightRadius:28,
-    padding:             28,
-    paddingBottom:       50,
+    borderTopRightRadius: 28,
+    padding: 28,
+    paddingBottom: 50,
   },
-  title:    { fontSize: 20, fontWeight: '700', color: Colors.text, marginBottom: 4 },
+  title: { fontSize: 20, fontWeight: '700', color: Colors.text, marginBottom: 4 },
   subtitle: { fontSize: 13, color: Colors.textMuted, marginBottom: 24 },
   label: {
     fontSize: 12, fontWeight: '600',
@@ -103,33 +161,24 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: Colors.background,
-    borderWidth:  1.5,
-    borderColor:  Colors.border,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
     borderRadius: 10,
-    padding:      12,
-    fontSize:     14,
-    color:        Colors.text,
+    padding: 12,
+    fontSize: 14,
+    color: Colors.text,
     marginBottom: 16,
   },
   btnPrimary: {
     backgroundColor: Colors.primary,
-    borderRadius:    10,
-    padding:         15,
-    alignItems:      'center',
-    marginBottom:    16,
-  },
-  btnText:   { color: '#fff', fontWeight: '700', fontSize: 15 },
-  divRow:    { flexDirection:'row', alignItems:'center', marginBottom: 16 },
-  divLine:   { flex: 1, height: 1, backgroundColor: Colors.border },
-  divLabel:  { marginHorizontal: 10, fontSize: 11, color: Colors.textLight },
-  btnGoogle: {
-    borderWidth:  1.5,
-    borderColor:  Colors.border,
     borderRadius: 10,
-    padding:      13,
-    alignItems:   'center',
-    marginBottom: 20,
+    padding: 15,
+    alignItems: 'center',
+    marginBottom: 16,
   },
-  btnGoogleText: { fontSize: 14, fontWeight: '600', color: Colors.text },
-  footer:        { textAlign: 'center', fontSize: 12, color: Colors.textMuted },
+  btnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  divRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+  divLine: { flex: 1, height: 1, backgroundColor: Colors.border },
+  divLabel: { marginHorizontal: 10, fontSize: 11, color: Colors.textLight },
+  footer: { textAlign: 'center', fontSize: 14, color: Colors.textMuted },
 });

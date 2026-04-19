@@ -5,17 +5,17 @@ import { Colors } from '../../constants/Colors';
 function PlusIcon() {
   return (
     <View style={{
-      width:           46,
-      height:          46,
-      borderRadius:    14,
+      width: 46,
+      height: 46,
+      borderRadius: 14,
       backgroundColor: Colors.primary,
-      alignItems:      'center',
-      justifyContent:  'center',
-      marginBottom:    10,
-      shadowColor:     Colors.primary,
-      shadowOpacity:   0.45,
-      shadowRadius:    8,
-      elevation:       6,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 10,
+      shadowColor: Colors.primary,
+      shadowOpacity: 0.45,
+      shadowRadius: 8,
+      elevation: 6,
     }}>
       <Text style={{ fontSize: 24, color: '#fff' }}>＋</Text>
     </View>
@@ -26,17 +26,17 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown:             false,
-        tabBarActiveTintColor:   Colors.primary,
+        headerShown: false,
+        tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.textLight,
         tabBarStyle: {
           borderTopColor: Colors.border,
-          height:         62,
-          paddingBottom:  10,
-          paddingTop:     4,
+          height: 62,
+          paddingBottom: 10,
+          paddingTop: 4,
         },
         tabBarLabelStyle: {
-          fontSize:   10,
+          fontSize: 10,
           fontWeight: '600',
         },
       }}
@@ -76,11 +76,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="history"
         options={{
-          title: 'Profile',
+          title: 'History',
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>👤</Text>
+            <Text style={{ fontSize: 20, color }}>⏳</Text>
           ),
         }}
       />

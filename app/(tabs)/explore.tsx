@@ -1,4 +1,6 @@
+import React, { useState } from 'react';
 import {
+  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
@@ -6,27 +8,26 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../constants/Colors';
-
-const CATEGORIES = [
-  { icon: '🚗', label: 'Cab Sharing', count: 12, color: '#F59E0B', bg: '#FFFBEB' },
-  { icon: '📚', label: 'Study Help',  count: 8,  color: '#10B981', bg: '#ECFDF5' },
-  { icon: '⚽', label: 'Sports',      count: 5,  color: '#3B82F6', bg: '#EFF6FF' },
-  { icon: '🎭', label: 'Other',       count: 3,  color: '#8B5CF6', bg: '#F5F3FF' },
-];
-
-const TRENDING = [
-  { icon: '🚗', bg: '#FFFBEB', title: 'Cab pool to City Mall',        meta: '📍 Gate A  🕐 Sat 3 PM',  count: '4 joined' },
-  { icon: '📚', bg: '#ECFDF5', title: 'Machine Learning exam prep',   meta: '📍 Lab 2   🕐 Today 6 PM', count: '6 joined' },
-  { icon: '⚽', bg: '#EFF6FF', title: '5-a-side football match',      meta: '📍 Ground B 🕐 Sun 5 PM',  count: '8 joined' },
-];
+import { catBg, catIcon, catLabel, initialRequests } from '../../store/AppStore';
 
 export default function ExploreScreen() {
+  const insets = useSafeAreaInsets();
+  const [query, setQuery] = useState('');
+
+  const results = query.trim()
+    ? initialRequests.filter(r =>
+      r.title.toLowerCase().includes(query.toLowerCase()) ||
+      r.cat.includes(query.toLowerCase()) ||
+      r.loc.toLowerCase().includes(query.toLowerCase())
+    )
+    : null;
+
   return (
     <View style={styles.screen}>
-
       {/* Hero */}
-      <View style={styles.hero}>
+      <View style={[styles.hero, { paddingTop: insets.top + 12 }]}>
         <Text style={styles.heroTitle}>Explore Campus 🎓</Text>
         <Text style={styles.heroSub}>Find students who share your needs</Text>
         <View style={styles.heroSearch}>
@@ -35,52 +36,86 @@ export default function ExploreScreen() {
             style={styles.heroInput}
             placeholder="Search categories, requests…"
             placeholderTextColor="rgba(255,255,255,0.6)"
+            value={query}
+            onChangeText={setQuery}
           />
+          {query.length > 0 && (
+            <TouchableOpacity onPress={() => setQuery('')}>
+              <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>✕</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 24 }}
-      >
-        {/* Category grid */}
-        <View style={styles.sectionHdr}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-        </View>
-        <View style={styles.catGrid}>
-          {CATEGORIES.map(c => (
-            <TouchableOpacity
-              key={c.label}
-              style={[styles.catTile, { backgroundColor: c.bg }]}
-            >
-              <Text style={styles.catIcon}>{c.icon}</Text>
-              <Text style={[styles.catLabel, { color: c.color }]}>{c.label}</Text>
-              <View style={[styles.catCount, { backgroundColor: c.color + '22' }]}>
-                <Text style={[styles.catCountText, { color: c.color }]}>
-                  {c.count} active
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
 
-        {/* Trending */}
-        <View style={styles.sectionHdr}>
-          <Text style={styles.sectionTitle}>Trending Near You</Text>
-          <Text style={styles.seeAll}>Refresh</Text>
-        </View>
-        {TRENDING.map(t => (
-          <TouchableOpacity key={t.title} style={styles.trendCard}>
-            <View style={[styles.trendIcon, { backgroundColor: t.bg }]}>
-              <Text style={{ fontSize: 18 }}>{t.icon}</Text>
+        {/* Search results */}
+        {results ? (
+          <View>
+            <View style={styles.sectionHdr}>
+              <Text style={styles.sectionTitle}>{results.length} result{results.length !== 1 ? 's' : ''} for "{query}"</Text>
             </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.trendTitle}>{t.title}</Text>
-              <Text style={styles.trendMeta}>{t.meta}</Text>
+            {results.length === 0 ? (
+              <View style={styles.empty}>
+                <Text style={styles.emptyIcon}>🔍</Text>
+                <Text style={styles.emptyTitle}>No results found</Text>
+                <Text style={styles.emptySub}>Try "cab", "study", or "sports"</Text>
+              </View>
+            ) : results.map(r => (
+              <View key={r.id} style={styles.resultCard}>
+                <View style={[styles.resultIcon, { backgroundColor: catBg(r.cat) }]}>
+                  <Text style={{ fontSize: 18 }}>{catIcon(r.cat)}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.resultTitle}>{r.title}</Text>
+                  <Text style={styles.resultMeta}>🕐 {r.time}  ·  📍 {r.loc}  ·  by {r.posterName}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        ) : (
+          // Default view
+          <>
+            <View style={styles.sectionHdr}>
+              <Text style={styles.sectionTitle}>Categories</Text>
             </View>
-            <Text style={styles.trendCount}>{t.count}</Text>
-          </TouchableOpacity>
-        ))}
+            <View style={styles.catGrid}>
+              {[
+                { cat: 'cab', bg: ['#F59E0B', '#D97706'], sub: 'Split ride costs' },
+                { cat: 'study', bg: ['#10B981', '#059669'], sub: 'Find study partners' },
+                { cat: 'sports', bg: ['#3B82F6', '#2563EB'], sub: 'Join games' },
+                { cat: 'other', bg: ['#8B5CF6', '#7C3AED'], sub: 'Everything else' },
+              ].map(c => (
+                <TouchableOpacity
+                  key={c.cat}
+                  style={[styles.catTile, { backgroundColor: c.bg[0] }]}
+                  onPress={() => setQuery(c.cat)}
+                >
+                  <Text style={styles.ctIcon}>{c.cat === 'other' ? '🎭' : catIcon(c.cat as any)}</Text>
+                  <Text style={styles.ctLabel}>{c.cat === 'other' ? 'Other' : catLabel(c.cat as any)}</Text>
+                  <Text style={styles.ctSub}>{c.sub}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={styles.sectionHdr}>
+              <Text style={styles.sectionTitle}>Trending Near You</Text>
+              <Text style={styles.seeAll}>Refresh</Text>
+            </View>
+            {initialRequests.slice(0, 3).map(r => (
+              <View key={r.id} style={styles.trendCard}>
+                <View style={[styles.trendIcon, { backgroundColor: catBg(r.cat) }]}>
+                  <Text style={{ fontSize: 18 }}>{catIcon(r.cat)}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.trendTitle}>{r.title}</Text>
+                  <Text style={styles.trendMeta}>📍 {r.loc}  ·  🕐 {r.time}</Text>
+                </View>
+                <Text style={styles.trendCount}>{Math.floor(Math.random() * 8) + 2} joined</Text>
+              </View>
+            ))}
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -90,73 +125,48 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Colors.background },
   hero: {
     backgroundColor: Colors.primary,
-    padding:         16,
-    paddingTop:      50,
-    paddingBottom:   20,
+    padding: 16, paddingTop: 52, paddingBottom: 20,
   },
-  heroTitle:  { fontSize: 20, fontWeight: '700', color: '#fff' },
-  heroSub:    { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
+  heroTitle: { fontSize: 20, fontWeight: '700', color: '#fff' },
+  heroSub: { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
   heroSearch: {
-    flexDirection:   'row',
-    alignItems:      'center',
-    gap:             8,
+    flexDirection: 'row', alignItems: 'center', gap: 8,
     backgroundColor: 'rgba(255,255,255,0.18)',
-    borderRadius:    10,
-    padding:         10,
-    marginTop:       12,
-    borderWidth:     1,
-    borderColor:     'rgba(255,255,255,0.3)',
+    borderRadius: 10, padding: 10, marginTop: 12,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)',
   },
   heroInput: { flex: 1, fontSize: 13, color: '#fff' },
   sectionHdr: {
-    flexDirection:     'row',
-    justifyContent:    'space-between',
-    alignItems:        'center',
-    paddingHorizontal: 16,
-    paddingTop:        16,
-    paddingBottom:     8,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8,
   },
   sectionTitle: { fontSize: 14, fontWeight: '600', color: Colors.text },
-  seeAll:       { fontSize: 12, fontWeight: '600', color: Colors.primary },
-  catGrid: {
-    flexDirection:     'row',
-    flexWrap:          'wrap',
-    paddingHorizontal: 16,
-    gap:               10,
-  },
-  catTile: {
-    width:         '47%',
-    borderRadius:  14,
-    padding:       16,
-  },
-  catIcon:  { fontSize: 28, marginBottom: 6 },
-  catLabel: { fontSize: 13, fontWeight: '700', marginBottom: 6 },
-  catCount: {
-    alignSelf:         'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical:   3,
-    borderRadius:      20,
-  },
-  catCountText: { fontSize: 11, fontWeight: '600' },
+  seeAll: { fontSize: 12, fontWeight: '600', color: Colors.primary },
+  catGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, gap: 10 },
+  catTile: { width: (Dimensions.get('window').width - 42) / 2, borderRadius: 14, padding: 16 },
+  ctIcon: { fontSize: 28, marginBottom: 6 },
+  ctLabel: { fontSize: 14, fontWeight: '700', color: '#fff' },
+  ctSub: { fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 },
   trendCard: {
-    flexDirection:    'row',
-    alignItems:       'center',
-    gap:              10,
-    backgroundColor:  Colors.card,
-    borderRadius:     12,
-    padding:          12,
-    marginHorizontal: 16,
-    marginBottom:     10,
-    borderWidth:      1.5,
-    borderColor:      Colors.border,
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: Colors.card, borderRadius: 12, padding: 12,
+    marginHorizontal: 16, marginBottom: 10,
+    borderWidth: 1.5, borderColor: Colors.border,
   },
-  trendIcon: {
-    width: 40, height: 40,
-    borderRadius:   12,
-    alignItems:     'center',
-    justifyContent: 'center',
-  },
+  trendIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   trendTitle: { fontSize: 13, fontWeight: '600', color: Colors.text },
-  trendMeta:  { fontSize: 11, color: Colors.textMuted, marginTop: 2 },
+  trendMeta: { fontSize: 11, color: Colors.textMuted, marginTop: 2 },
   trendCount: { fontSize: 12, fontWeight: '700', color: Colors.primary },
+  resultCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    padding: 12, borderBottomWidth: 1, borderBottomColor: Colors.border,
+    backgroundColor: Colors.card,
+  },
+  resultIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  resultTitle: { fontSize: 13, fontWeight: '600', color: Colors.text },
+  resultMeta: { fontSize: 11, color: Colors.textMuted, marginTop: 2 },
+  empty: { alignItems: 'center', paddingTop: 40 },
+  emptyIcon: { fontSize: 36, marginBottom: 8 },
+  emptyTitle: { fontSize: 15, fontWeight: '700', color: Colors.text },
+  emptySub: { fontSize: 13, color: Colors.textMuted, marginTop: 4 },
 });

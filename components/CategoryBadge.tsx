@@ -5,8 +5,8 @@ type Props = {
 };
 
 const config = {
-  cab:    { icon: '🚗', label: 'Cab',   color: '#92400E', bg: '#FFFBEB' },
-  study:  { icon: '📚', label: 'Study', color: '#065F46', bg: '#ECFDF5' },
+  cab: { icon: '🚗', label: 'Cab', color: '#92400E', bg: '#FFFBEB' },
+  study: { icon: '📚', label: 'Study', color: '#065F46', bg: '#ECFDF5' },
   sports: { icon: '⚽', label: 'Sport', color: '#1E40AF', bg: '#EFF6FF' },
 };
 
@@ -22,14 +22,14 @@ export function CategoryBadge({ type }: Props) {
 
 const styles = StyleSheet.create({
   badge: {
-    flexDirection:     'row',
-    alignItems:        'center',
-    gap:               4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingHorizontal: 10,
-    paddingVertical:   4,
-    borderRadius:      20,
-    alignSelf:         'flex-start',
+    paddingVertical: 4,
+    borderRadius: 20,
+    alignSelf: 'flex-start',
   },
-  icon:  { fontSize: 11 },
+  icon: { fontSize: 11 },
   label: { fontSize: 11, fontWeight: '700' },
 });

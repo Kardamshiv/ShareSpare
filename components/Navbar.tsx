@@ -2,10 +2,10 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Colors } from '../constants/Colors';
 
 type Props = {
-  title?:          string;
-  showBack?:       boolean;
-  onBack?:         () => void;
-  rightElement?:   React.ReactNode;
+  title?: string;
+  showBack?: boolean;
+  onBack?: () => void;
+  rightElement?: React.ReactNode;
 };
 
 export function Navbar({
@@ -42,35 +42,35 @@ export function Navbar({
 
 const styles = StyleSheet.create({
   navbar: {
-    flexDirection:    'row',
-    alignItems:       'center',
-    justifyContent:   'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical:   12,
-    backgroundColor:  Colors.card,
+    paddingVertical: 12,
+    backgroundColor: Colors.card,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
   },
   logo: {
-    fontSize:   18,
+    fontSize: 18,
     fontWeight: '700',
-    color:      Colors.primary,
+    color: Colors.primary,
   },
   backBtn: {
-    width:          34,
-    height:         34,
-    borderRadius:   10,
+    width: 34,
+    height: 34,
+    borderRadius: 10,
     backgroundColor: Colors.background,
-    borderWidth:    1,
-    borderColor:    Colors.border,
-    alignItems:     'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   backIcon: { fontSize: 16, color: Colors.textSecondary },
   centerTitle: {
-    fontSize:   16,
+    fontSize: 16,
     fontWeight: '600',
-    color:      Colors.text,
+    color: Colors.text,
   },
   rightSlot: { minWidth: 34, alignItems: 'flex-end' },
 });
