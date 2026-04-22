@@ -1,9 +1,14 @@
 node_modules
 .expo
 .git
+.idea
+.vscode
 android
 ios
 dist
 web-build
-.vscode
-.idea
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
