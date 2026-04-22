@@ -9,11 +9,13 @@ import {
   View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '../../constants/Colors';
+import { useSettings } from '../../store/SettingsProvider';
 import { catBg, catIcon, catLabel, initialRequests } from '../../store/AppStore';
 
 export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
+  const { colors } = useSettings();
+  const styles = getStyles(colors);
   const [query, setQuery] = useState('');
 
   const results = query.trim()
@@ -81,10 +83,10 @@ export default function ExploreScreen() {
             </View>
             <View style={styles.catGrid}>
               {[
-                { cat: 'cab', bg: ['#F59E0B', '#D97706'], sub: 'Split ride costs' },
-                { cat: 'study', bg: ['#10B981', '#059669'], sub: 'Find study partners' },
+                { cat: 'cab',    bg: ['#F59E0B', '#D97706'], sub: 'Split ride costs' },
+                { cat: 'study',  bg: ['#10B981', '#059669'], sub: 'Find study partners' },
                 { cat: 'sports', bg: ['#3B82F6', '#2563EB'], sub: 'Join games' },
-                { cat: 'other', bg: ['#8B5CF6', '#7C3AED'], sub: 'Everything else' },
+                { cat: 'other',  bg: ['#8B5CF6', '#7C3AED'], sub: 'Everything else' },
               ].map(c => (
                 <TouchableOpacity
                   key={c.cat}
@@ -121,13 +123,13 @@ export default function ExploreScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Colors.background },
+const getStyles = (colors: any) => StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.background },
   hero: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
     padding: 16, paddingTop: 52, paddingBottom: 20,
   },
-  heroTitle: { fontSize: 20, fontWeight: '700', color: '#fff' },
+  heroTitle: { fontSize: 20, fontWeight: '700', color: colors.primaryTextAuto },
   heroSub: { fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 },
   heroSearch: {
     flexDirection: 'row', alignItems: 'center', gap: 8,
@@ -135,38 +137,38 @@ const styles = StyleSheet.create({
     borderRadius: 10, padding: 10, marginTop: 12,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)',
   },
-  heroInput: { flex: 1, fontSize: 13, color: '#fff' },
+  heroInput: { flex: 1, fontSize: 13, color: colors.primaryTextAuto },
   sectionHdr: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8,
   },
-  sectionTitle: { fontSize: 14, fontWeight: '600', color: Colors.text },
-  seeAll: { fontSize: 12, fontWeight: '600', color: Colors.primary },
+  sectionTitle: { fontSize: 14, fontWeight: '600', color: colors.text },
+  seeAll: { fontSize: 12, fontWeight: '600', color: colors.primary },
   catGrid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, gap: 10 },
   catTile: { width: (Dimensions.get('window').width - 42) / 2, borderRadius: 14, padding: 16 },
   ctIcon: { fontSize: 28, marginBottom: 6 },
-  ctLabel: { fontSize: 14, fontWeight: '700', color: '#fff' },
+  ctLabel: { fontSize: 14, fontWeight: '700', color: colors.primaryTextAuto },
   ctSub: { fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 2 },
   trendCard: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: Colors.card, borderRadius: 12, padding: 12,
+    backgroundColor: colors.card, borderRadius: 12, padding: 12,
     marginHorizontal: 16, marginBottom: 10,
-    borderWidth: 1.5, borderColor: Colors.border,
+    borderWidth: 1.5, borderColor: colors.border,
   },
   trendIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  trendTitle: { fontSize: 13, fontWeight: '600', color: Colors.text },
-  trendMeta: { fontSize: 11, color: Colors.textMuted, marginTop: 2 },
-  trendCount: { fontSize: 12, fontWeight: '700', color: Colors.primary },
+  trendTitle: { fontSize: 13, fontWeight: '600', color: colors.text },
+  trendMeta: { fontSize: 11, color: colors.textMuted, marginTop: 2 },
+  trendCount: { fontSize: 12, fontWeight: '700', color: colors.primary },
   resultCard: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    padding: 12, borderBottomWidth: 1, borderBottomColor: Colors.border,
-    backgroundColor: Colors.card,
+    padding: 12, borderBottomWidth: 1, borderBottomColor: colors.border,
+    backgroundColor: colors.card,
   },
   resultIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  resultTitle: { fontSize: 13, fontWeight: '600', color: Colors.text },
-  resultMeta: { fontSize: 11, color: Colors.textMuted, marginTop: 2 },
+  resultTitle: { fontSize: 13, fontWeight: '600', color: colors.text },
+  resultMeta: { fontSize: 11, color: colors.textMuted, marginTop: 2 },
   empty: { alignItems: 'center', paddingTop: 40 },
   emptyIcon: { fontSize: 36, marginBottom: 8 },
-  emptyTitle: { fontSize: 15, fontWeight: '700', color: Colors.text },
-  emptySub: { fontSize: 13, color: Colors.textMuted, marginTop: 4 },
+  emptyTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
+  emptySub: { fontSize: 13, color: colors.textMuted, marginTop: 4 },
 });

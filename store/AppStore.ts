@@ -11,6 +11,7 @@ export type Request = {
   cat:         Category;
   time:        string;
   loc:         string;
+  posterId:    string;
   poster:      string;   // initials
   posterName:  string;
   color:       string;
@@ -41,33 +42,33 @@ export const initialRequests: Request[] = [
   {
     id: 'r1', title: 'Cab to Airport – Sunday 6 AM',
     cat: 'cab', time: '6:00 AM, Sun', loc: 'Gate B',
-    poster: 'PM', posterName: 'Priya Mehta',
+    posterId: 'pm-id', poster: 'PM', posterName: 'Priya Mehta',
     color: '#F59E0B', accepted: false, isMine: false,
     maxMembers: 4, currentMembers: 1,
   },
   {
     id: 'r2', title: 'DSA prep – need study partner',
     cat: 'study', time: '2 hrs/day', loc: 'Library C',
-    poster: 'AP', posterName: 'Arjun Patel',
+    posterId: 'ap-id', poster: 'AP', posterName: 'Arjun Patel',
     color: '#10B981', accepted: false, isMine: false,
   },
   {
     id: 'r3', title: 'Cricket partner – Saturday 4 PM',
     cat: 'sports', time: 'Sat 4:00 PM', loc: 'Ground A',
-    poster: 'KN', posterName: 'Kabir Nair',
+    posterId: 'kn-id', poster: 'KN', posterName: 'Kabir Nair',
     color: '#3B82F6', accepted: false, isMine: false,
   },
   {
     id: 'r4', title: 'Cab to City Mall – Friday 3 PM',
     cat: 'cab', time: 'Fri 3:00 PM', loc: 'Gate A',
-    poster: 'SJ', posterName: 'Sneha Joshi',
+    posterId: 'sj-id', poster: 'SJ', posterName: 'Sneha Joshi',
     color: '#F59E0B', accepted: false, isMine: false,
     maxMembers: 3, currentMembers: 2,
   },
   {
     id: 'r5', title: 'ML exam prep – Today 6 PM',
     cat: 'study', time: 'Today 6 PM', loc: 'Lab 2',
-    poster: 'RD', posterName: 'Riya Desai',
+    posterId: 'rd-id', poster: 'RD', posterName: 'Riya Desai',
     color: '#10B981', accepted: false, isMine: false,
   },
 ];

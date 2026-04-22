@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Colors } from '../constants/Colors';
+import { useSettings } from '../store/SettingsProvider';
 import { catBg, Category, catIcon, catLabel, catTextColor } from '../store/AppStore';
 
 type Props = {
@@ -15,26 +15,30 @@ type Props = {
   accepted: boolean;
   maxMembers?: number;
   currentMembers?: number;
+  isMine: boolean;
   onAccept: () => void;
   onIgnore: () => void;
   onChat: () => void;
+  onDelete?: () => void;
 };
 
 export function RequestCard({
   title, category, time, location,
-  poster, color, accepted,
+  poster, color, accepted, isMine,
   maxMembers, currentMembers,
-  onAccept, onIgnore, onChat
+  onAccept, onIgnore, onChat, onDelete
 }: Props) {
+  const { colors } = useSettings();
+  const styles = getStyles(colors);
 
-  const catColors = {
-    cab: { border: '#F59E0B' },
-    study: { border: '#10B981' },
+  const catBorderColors = {
+    cab:    { border: '#F59E0B' },
+    study:  { border: '#10B981' },
     sports: { border: '#3B82F6' },
   };
 
   return (
-    <View style={[styles.card, { borderLeftColor: catColors[category].border }]}>
+    <View style={[styles.card, { borderLeftColor: catBorderColors[category].border }]}>
 
       {/* Top */}
       <View style={styles.topRow}>
@@ -70,10 +74,13 @@ export function RequestCard({
         </View>
       )}
 
-      {/* ── BUTTONS: changes based on accepted state ── */}
+      {/* ── BUTTONS ── */}
       <View style={styles.actions}>
-        {accepted ? (
-          // ── ACCEPTED STATE: show tag + Chat button ──
+        {isMine ? (
+          <TouchableOpacity style={styles.deleteBtn} onPress={onDelete}>
+            <Text style={styles.deleteText}>🗑️  Delete</Text>
+          </TouchableOpacity>
+        ) : accepted ? (
           <>
             <View style={styles.acceptedTag}>
               <Text style={styles.acceptedTagText}>✅  Accepted</Text>
@@ -83,7 +90,6 @@ export function RequestCard({
             </TouchableOpacity>
           </>
         ) : (
-          // ── DEFAULT STATE: Accept + Ignore ──
           <>
             <TouchableOpacity style={styles.acceptBtn} onPress={onAccept}>
               <Text style={styles.acceptText}>✓  Accept</Text>
@@ -98,17 +104,17 @@ export function RequestCard({
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (colors: any) => StyleSheet.create({
   card: {
-    backgroundColor: Colors.card,
+    backgroundColor: colors.card,
     borderRadius: 14,
     padding: 14,
     marginBottom: 12,
     marginHorizontal: 16,
     borderWidth: 1.5,
-    borderColor: Colors.border,
+    borderColor: colors.border,
     borderLeftWidth: 3,
-    shadowColor: '#000',
+    shadowColor: colors.text,
     shadowOpacity: 0.06,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 8,
@@ -134,56 +140,58 @@ const styles = StyleSheet.create({
     width: 30, height: 30, borderRadius: 9,
     alignItems: 'center', justifyContent: 'center',
   },
-  avatarText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  avatarText: { color: colors.primaryTextAuto, fontSize: 11, fontWeight: '700' },
   title: {
     fontSize: 14, fontWeight: '600',
-    color: Colors.text, marginBottom: 6, lineHeight: 20,
+    color: colors.text, marginBottom: 6, lineHeight: 20,
   },
   metaRow: { flexDirection: 'row', marginBottom: 12 },
-  meta: { fontSize: 11, color: Colors.textMuted },
+  meta: { fontSize: 11, color: colors.textMuted },
   actions: { flexDirection: 'row', gap: 8, alignItems: 'center' },
 
-  // Accept button
   acceptBtn: {
-    flex: 1, backgroundColor: Colors.accept,
+    flex: 1, backgroundColor: colors.accept,
     padding: 9, borderRadius: 8, alignItems: 'center',
   },
-  acceptText: { color: '#fff', fontWeight: '600', fontSize: 12 },
+  acceptText: { color: colors.primaryTextAuto, fontWeight: '600', fontSize: 12 },
 
-  // Ignore button
   ignoreBtn: {
-    flex: 1, backgroundColor: Colors.ignoreLight,
-    borderWidth: 1.5, borderColor: '#FECACA',
+    flex: 1, backgroundColor: colors.ignoreLight,
+    borderWidth: 1.5, borderColor: colors.ignore,
     padding: 9, borderRadius: 8, alignItems: 'center',
   },
-  ignoreText: { color: Colors.ignore, fontWeight: '600', fontSize: 12 },
+  ignoreText: { color: colors.ignore, fontWeight: '600', fontSize: 12 },
 
-  // Accepted tag (shown after accepting)
   acceptedTag: {
-    backgroundColor: Colors.acceptLight,
+    backgroundColor: colors.acceptLight,
     borderWidth: 1,
-    borderColor: '#BBF7D0',
+    borderColor: colors.accept,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 8,
   },
-  acceptedTagText: { color: Colors.accept, fontWeight: '700', fontSize: 12 },
+  acceptedTagText: { color: colors.accept, fontWeight: '700', fontSize: 12 },
 
-  // Chat button (shown after accepting)
   chatBtn: {
     flex: 1,
-    backgroundColor: Colors.primaryLight,
+    backgroundColor: colors.primaryLight,
     borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderColor: colors.primary,
     padding: 9,
     borderRadius: 8,
     alignItems: 'center',
   },
-  chatBtnText: { color: Colors.primary, fontWeight: '700', fontSize: 12 },
+  chatBtnText: { color: colors.primary, fontWeight: '700', fontSize: 12 },
 
-  // Cab member indicator
+  deleteBtn: {
+    flex: 1, backgroundColor: colors.ignoreLight,
+    borderWidth: 1.5, borderColor: colors.ignore,
+    padding: 9, borderRadius: 8, alignItems: 'center',
+  },
+  deleteText: { color: colors.ignore, fontWeight: '700', fontSize: 12 },
+
   memberRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
-  memberText: { fontSize: 11, fontWeight: '600', color: Colors.textMuted },
-  memberBar: { flex: 1, height: 6, borderRadius: 3, backgroundColor: Colors.border },
+  memberText: { fontSize: 11, fontWeight: '600', color: colors.textMuted },
+  memberBar: { flex: 1, height: 6, borderRadius: 3, backgroundColor: colors.border },
   memberFill: { height: 6, borderRadius: 3, backgroundColor: '#F59E0B' },
 });

@@ -1,36 +1,43 @@
-import { Tabs } from 'expo-router';
+import { Tabs, useSegments } from 'expo-router';
 import { Text, View } from 'react-native';
-import { Colors } from '../../constants/Colors';
+import { useSettings } from '../../store/SettingsProvider';
 
-function PlusIcon() {
+function PlusIcon({ colors }: { colors: any }) {
   return (
     <View style={{
       width: 46,
       height: 46,
       borderRadius: 14,
-      backgroundColor: Colors.primary,
+      backgroundColor: colors.primary,
       alignItems: 'center',
       justifyContent: 'center',
       marginBottom: 10,
-      shadowColor: Colors.primary,
+      shadowColor: colors.primary,
       shadowOpacity: 0.45,
       shadowRadius: 8,
       elevation: 6,
     }}>
-      <Text style={{ fontSize: 24, color: '#fff' }}>＋</Text>
+      <Text style={{ fontSize: 24, color: colors.primaryTextAuto }}>＋</Text>
     </View>
   );
 }
 
 export default function TabLayout() {
+  const { colors, t, unreadChats } = useSettings();
+  const segments = useSegments();
+  const hideNav = segments.includes('chat');
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textLight,
+        tabBarHideOnKeyboard: true,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textLight,
         tabBarStyle: {
-          borderTopColor: Colors.border,
+          display: hideNav ? 'none' : 'flex',
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
           height: 62,
           paddingBottom: 10,
           paddingTop: 4,
@@ -44,7 +51,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: t('Home'),
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 20, color }}>🏠</Text>
           ),
@@ -53,7 +60,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
+          title: t('Explore'),
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 20, color }}>🔍</Text>
           ),
@@ -63,22 +70,27 @@ export default function TabLayout() {
         name="post"
         options={{
           title: '',
-          tabBarIcon: () => <PlusIcon />,
+          tabBarIcon: () => <PlusIcon colors={colors} />,
         }}
       />
       <Tabs.Screen
         name="chat"
         options={{
-          title: 'Chat',
+          title: t('Chat'),
           tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>💬</Text>
+            <View>
+              <Text style={{ fontSize: 20, color }}>💬</Text>
+              {unreadChats.size > 0 && (
+                <View style={{position: 'absolute', top: -3, right: -6, backgroundColor: colors.ignore, width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: colors.card}}/>
+              )}
+            </View>
           ),
         }}
       />
       <Tabs.Screen
         name="history"
         options={{
-          title: 'History',
+          title: t('History'),
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 20, color }}>⏳</Text>
           ),

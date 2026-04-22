@@ -5,9 +5,13 @@ import { Request } from '../store/AppStore';
 export function useRequests() {
   const [requests, setRequests] = useState<Request[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   async function fetchRequests() {
     setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) setCurrentUserId(user.id);
+
     // Fetch all requests
     const { data: reqData, error: reqError } = await supabase
       .from('requests')
@@ -21,11 +25,12 @@ export function useRequests() {
         cat: r.category as any,
         time: r.time,
         loc: r.location,
+        posterId: r.poster_id,
         poster: r.profiles?.initials || '??',
         posterName: r.profiles?.full_name || 'Anonymous',
         color: r.color,
         accepted: false,
-        isMine: false,
+        isMine: user ? (r.poster_id === user.id) : false,
         maxMembers: r.max_members || undefined,
         currentMembers: 1, // Optional: count from request_members
       }));
@@ -38,7 +43,7 @@ export function useRequests() {
     fetchRequests();
 
     // Subscribe to realtime updates
-    const subscription = supabase.channel('public:requests')
+    const subscription = supabase.channel(`public:requests_${Date.now()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'requests' }, () => {
         fetchRequests();
       })
@@ -49,5 +54,5 @@ export function useRequests() {
     };
   }, []);
 
-  return { requests, fetchRequests, loading };
+  return { requests, fetchRequests, loading, currentUserId };
 }

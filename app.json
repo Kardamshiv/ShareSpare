@@ -7,9 +7,15 @@
     "icon": "./assets/images/icon.png",
     "scheme": "sharespare",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "ShareSpare needs microphone access to record voice messages.",
+        "NSCameraUsageDescription": "ShareSpare requires camera access to capture rich media for chat and requests.",
+        "NSPhotoLibraryUsageDescription": "ShareSpare requires photo library access to upload avatars and share media.",
+        "NSLocationWhenInUseUsageDescription": "ShareSpare uses your location to match requests and share live locations in chats."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +26,15 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.shivkardam.ShareSpare"
+      "package": "com.shivkardam.sharespare",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "RECORD_AUDIO",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",
@@ -39,11 +53,29 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "ShareSpare needs microphone access to record voice messages."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "ShareSpare requires location to accurately map local requests and enable live location sharing."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "ShareSpare requires photos access to attach images to requests.",
+          "cameraPermission": "ShareSpare requires camera access to snap request photos."
+        }
       ]
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": false
     },
     "extra": {
       "eas": {

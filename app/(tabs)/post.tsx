@@ -10,7 +10,7 @@ import {
     View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '../../constants/Colors';
+import { useSettings } from '../../store/SettingsProvider';
 import { Category } from '../../store/AppStore';
 import { supabase } from '../../lib/supabase';
 import { useRouter } from 'expo-router';
@@ -28,6 +28,8 @@ const MEMBER_OPTIONS = [2, 3, 4, 5, 6];
 export default function PostScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
+    const { colors, t } = useSettings();
+    const styles = getStyles(colors);
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState<Category>('cab');
     const [time, setTime] = useState('');
@@ -86,7 +88,7 @@ export default function PostScreen() {
         <View style={styles.screen}>
             {/* Navbar */}
             <View style={[styles.navbar, { paddingTop: insets.top + 8 }]}>
-                <Text style={styles.navTitle}>Create Post</Text>
+                <Text style={styles.navTitle}>{t('Create Post')}</Text>
             </View>
 
             <ScrollView
@@ -95,7 +97,7 @@ export default function PostScreen() {
                 keyboardShouldPersistTaps="handled"
             >
                 {/* Category Picker */}
-                <Text style={styles.label}>Category</Text>
+                <Text style={styles.label}>{t('Category')}</Text>
                 <View style={styles.catRow}>
                     {CATEGORIES.map(c => (
                         <TouchableOpacity
@@ -109,40 +111,40 @@ export default function PostScreen() {
                             <Text style={styles.catChipIcon}>{c.icon}</Text>
                             <Text style={[
                                 styles.catChipText,
-                                category === c.key && { color: '#fff' },
+                                category === c.key && { color: colors.primaryTextAuto },
                             ]}>
-                                {c.label}
+                                {t(c.key === 'cab' ? 'Cab' : c.key === 'study' ? 'Study' : 'Sports')}
                             </Text>
                         </TouchableOpacity>
                     ))}
                 </View>
 
                 {/* Title */}
-                <Text style={styles.label}>Request Title</Text>
+                <Text style={styles.label}>{t('Request Title')}</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="e.g. Cab to Airport – Sunday 6 AM"
-                    placeholderTextColor={Colors.textLight}
+                    placeholderTextColor={colors.textLight}
                     value={title}
                     onChangeText={setTitle}
                 />
 
                 {/* Time */}
-                <Text style={styles.label}>Time</Text>
+                <Text style={styles.label}>{t('Time')}</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="e.g. Today 5:30 PM"
-                    placeholderTextColor={Colors.textLight}
+                    placeholderTextColor={colors.textLight}
                     value={time}
                     onChangeText={setTime}
                 />
 
                 {/* Location */}
-                <Text style={styles.label}>Location</Text>
+                <Text style={styles.label}>{t('Location')}</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="e.g. Gate B, Main Campus"
-                    placeholderTextColor={Colors.textLight}
+                    placeholderTextColor={colors.textLight}
                     value={location}
                     onChangeText={setLocation}
                 />
@@ -150,9 +152,9 @@ export default function PostScreen() {
                 {/* Cab Member Limit – only for cab */}
                 {category === 'cab' && (
                     <>
-                        <Text style={styles.label}>Max Cab Members</Text>
+                        <Text style={styles.label}>{t('Max Cab Members')}</Text>
                         <Text style={styles.helperText}>
-                            Set the maximum number of people who can join this ride
+                            {t('Set max members')}
                         </Text>
                         <View style={styles.memberRow}>
                             {MEMBER_OPTIONS.map(n => (
@@ -175,7 +177,7 @@ export default function PostScreen() {
                         </View>
                         <View style={styles.memberInfo}>
                             <Text style={styles.memberInfoText}>
-                                👥  {maxMembers} seats total (including you)
+                                👥  {maxMembers} {t('seats total')}
                             </Text>
                         </View>
                     </>
@@ -188,7 +190,7 @@ export default function PostScreen() {
                     disabled={loading}
                 >
                     <Text style={styles.submitText}>
-                        {loading ? 'Posting...' : '📤  Post Request'}
+                        {loading ? t('Posting...') : t('Post Request')}
                     </Text>
                 </TouchableOpacity>
             </ScrollView>
@@ -196,29 +198,29 @@ export default function PostScreen() {
     );
 }
 
-const styles = StyleSheet.create({
-    screen: { flex: 1, backgroundColor: Colors.background },
+const getStyles = (colors: any) => StyleSheet.create({
+    screen: { flex: 1, backgroundColor: colors.background },
     navbar: {
         paddingHorizontal: 16,
         paddingVertical: 14,
-        backgroundColor: Colors.card,
+        backgroundColor: colors.card,
         borderBottomWidth: 1,
-        borderBottomColor: Colors.border,
+        borderBottomColor: colors.border,
     },
-    navTitle: { fontSize: 18, fontWeight: '700', color: Colors.text },
+    navTitle: { fontSize: 18, fontWeight: '700', color: colors.text },
     formWrap: { padding: 16, paddingBottom: 40 },
     label: {
-        fontSize: 12, fontWeight: '700', color: Colors.textMuted,
+        fontSize: 12, fontWeight: '700', color: colors.textMuted,
         textTransform: 'uppercase', letterSpacing: 1,
         marginTop: 16, marginBottom: 8,
     },
     helperText: {
-        fontSize: 12, color: Colors.textLight, marginBottom: 8, marginTop: -4,
+        fontSize: 12, color: colors.textLight, marginBottom: 8, marginTop: -4,
     },
     input: {
-        backgroundColor: Colors.card, borderRadius: 12, padding: 14,
-        fontSize: 14, color: Colors.text,
-        borderWidth: 1.5, borderColor: Colors.border,
+        backgroundColor: colors.card, borderRadius: 12, padding: 14,
+        fontSize: 14, color: colors.text,
+        borderWidth: 1.5, borderColor: colors.border,
     },
     catRow: {
         flexDirection: 'row', gap: 8,
@@ -226,40 +228,40 @@ const styles = StyleSheet.create({
     catChip: {
         flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
         gap: 5, paddingVertical: 10, borderRadius: 10,
-        borderWidth: 1.5, borderColor: Colors.border, backgroundColor: Colors.card,
+        borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.card,
     },
     catChipIcon: { fontSize: 16 },
-    catChipText: { fontSize: 12, fontWeight: '600', color: Colors.textMuted },
+    catChipText: { fontSize: 12, fontWeight: '600', color: colors.textMuted },
 
     // Member limit picker
     memberRow: { flexDirection: 'row', gap: 8 },
     memberChip: {
         width: (SCREEN_W - 32 - 32) / 5,
         paddingVertical: 12, borderRadius: 10,
-        borderWidth: 1.5, borderColor: Colors.border,
-        backgroundColor: Colors.card, alignItems: 'center',
+        borderWidth: 1.5, borderColor: colors.border,
+        backgroundColor: colors.card, alignItems: 'center',
     },
     memberChipActive: {
         backgroundColor: '#F59E0B', borderColor: '#F59E0B',
     },
     memberChipText: {
-        fontSize: 16, fontWeight: '700', color: Colors.textMuted,
+        fontSize: 16, fontWeight: '700', color: colors.textMuted,
     },
-    memberChipTextActive: { color: '#fff' },
+    memberChipTextActive: { color: colors.primaryTextAuto },
     memberInfo: {
         flexDirection: 'row', alignItems: 'center',
-        backgroundColor: '#FFFBEB', borderRadius: 8,
+        backgroundColor: colors.acceptLight, borderRadius: 8,
         padding: 10, marginTop: 8,
-        borderWidth: 1, borderColor: '#FDE68A',
+        borderWidth: 1, borderColor: colors.accept,
     },
-    memberInfoText: { fontSize: 12, fontWeight: '600', color: '#92400E' },
+    memberInfoText: { fontSize: 12, fontWeight: '600', color: colors.accept },
 
     // Submit
     submitBtn: {
-        backgroundColor: Colors.primary, borderRadius: 12,
+        backgroundColor: colors.primary, borderRadius: 12,
         padding: 16, alignItems: 'center', marginTop: 24,
-        shadowColor: Colors.primary, shadowOpacity: 0.35,
+        shadowColor: colors.primary, shadowOpacity: 0.35,
         shadowRadius: 8, elevation: 4,
     },
-    submitText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+    submitText: { color: colors.primaryTextAuto, fontSize: 16, fontWeight: '700' },
 });

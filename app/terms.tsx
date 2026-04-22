@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { Colors } from '../constants/Colors';
+import { useSettings } from '../store/SettingsProvider';
 
 const SECTIONS = [
   { title: '1. Eligibility', body: 'ShareSpare is exclusively for enrolled students of participating colleges. You must use your official college email address to register and access the platform.' },
@@ -14,6 +14,9 @@ const SECTIONS = [
 
 export default function TermsScreen() {
   const router = useRouter();
+  const { colors } = useSettings();
+  const styles = getStyles(colors);
+
   return (
     <View style={styles.screen}>
       <View style={styles.navbar}>
@@ -40,18 +43,30 @@ export default function TermsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: Colors.background },
-  navbar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, paddingTop: 50, backgroundColor: Colors.card, borderBottomWidth: 1, borderBottomColor: Colors.border },
-  backBtn: { width: 32, height: 32, borderRadius: 9, backgroundColor: Colors.background, borderWidth: 1, borderColor: Colors.border, alignItems: 'center', justifyContent: 'center' },
-  backArrow: { fontSize: 16, color: Colors.textSecondary },
-  navTitle: { fontSize: 17, fontWeight: '700', color: Colors.text },
+const getStyles = (colors: any) => StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.background },
+  navbar: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingVertical: 14, paddingTop: 50,
+    backgroundColor: colors.card,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
+  },
+  backBtn: {
+    width: 32, height: 32, borderRadius: 9,
+    backgroundColor: colors.background, borderWidth: 1, borderColor: colors.border,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  backArrow: { fontSize: 16, color: colors.textSecondary },
+  navTitle: { fontSize: 17, fontWeight: '700', color: colors.text },
   body: { padding: 16, paddingBottom: 40 },
-  heading: { fontSize: 18, fontWeight: '700', color: Colors.text, marginBottom: 8 },
-  intro: { fontSize: 13, color: Colors.textMuted, lineHeight: 20, marginBottom: 16 },
+  heading: { fontSize: 18, fontWeight: '700', color: colors.text, marginBottom: 8 },
+  intro: { fontSize: 13, color: colors.textMuted, lineHeight: 20, marginBottom: 16 },
   section: { marginBottom: 16 },
-  sTitle: { fontSize: 14, fontWeight: '700', color: Colors.text, marginBottom: 5 },
-  sBody: { fontSize: 13, color: Colors.textMuted, lineHeight: 21 },
-  acceptBtn: { backgroundColor: Colors.primary, borderRadius: 12, padding: 15, alignItems: 'center', marginTop: 8 },
+  sTitle: { fontSize: 14, fontWeight: '700', color: colors.text, marginBottom: 5 },
+  sBody: { fontSize: 13, color: colors.textMuted, lineHeight: 21 },
+  acceptBtn: {
+    backgroundColor: colors.primary, borderRadius: 12, padding: 15,
+    alignItems: 'center', marginTop: 8,
+  },
   acceptText: { color: '#fff', fontWeight: '700', fontSize: 15 },
 });
