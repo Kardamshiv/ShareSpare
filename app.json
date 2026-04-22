@@ -79,9 +79,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "616b7070-d942-462c-a876-b7161186e093"
       }
-    },
-    "owner": "shivkardam"
+    }
   }
 }
